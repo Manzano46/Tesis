@@ -1,0 +1,67 @@
+\documentclass[11pt,letterpaper]{report} \usepackage[utf8]{inputenc} \usepackage[spanish]{babel}
+
+% Configuración de margenes y ancho de página \oddsidemargin=1.0cm \evensidemargin=1.0cm \topmargin=1.0cm \textwidth=16.5cm \textheight=22.5cm \parindent=1.25cm \parskip=0.5cm
+
+% Paquetes adicionales \usepackage{graphicx} \usepackage{amsmath} \usepackage{algorithm} \usepackage{algorithmic}
+
+% Definiciones personalizadas \newtheorem{teorema}{Teorema} \newtheorem{lemma}{Lema} \newtheorem{corolario}{Corolario} \newtheorem{definicion}{Definición}
+
+\begin{document}
+
+\thispagestyle{empty} \centering {\scshape\LARGE Universidad de La Habana}\\{\scshape\LARGE Facultad de Matem\'atica y Computaci\'on}\\ {\scshape\LARGE Tesis de Licenciatura}\ \bigskip \par\vspace{4cm} {\scshape\LARGE \textbf{Kevin Manzano Rodr\'iguez}}\ \medskip \textit{Trabajo realizado bajo la dirección del}\ \textit{Profesor \textbf{Rodrigo Garc\'ia G\'omez}}\ \vspace*{2cm}
+
+\begin{abstract} \centering \large Propuesta de heur\'istica para mejorar la elecci\'on de aristas para perturbar en el minimizador. \end{abstract}
+
+\tableofcontents \newpage
+
+\chapter{Introducción} 
+Sea $G=(V,E)$ un grafo general. Se cuenta con un explainer denominado \texttt{generator-minimizer} que opera en dos pasos. En el primero se genera un contrafractual (un grafo $G'$ creado a partir de $G$ que dado un modelo cambia la predicci\'on con respecto a $G$). Luego este se pasa como entrada al minimizador, para encontrar uno m\'as pequeño. En el segundo paso, se utiliza una heur\'istica la cual tiene un componente aleatorio para seleccionar aristas a perturbar (cambiar de estado, si la arista est\'a en $G$ se retira, y si no est\'a se agrega), se busca mejorar esta componente en este documento d\'andole un sentido a la elecci\'on para hacerla m\'as efectiva.
+
+\chapter{Capítulo 2}
+
+En muchos modelos de forma general se observa que existen componentes del grafo que parecen tener un peso grande en la predicci\'on final del mismo, d\'igase nodos muy conectados entre s\'i, aristas que forman ciclos, aristas que al quitarlas se pierde la conexi\'on del grafo ect. Dado que no sabemos con que modelo estamos tratando vamos a realizar un preprocesamiento para seg\'un el modelo en cuesti\'on, \'el mismo le de sentido a las relaciones.\\
+
+
+Definamos la funci\'on $f: E \times E \rightarrow \mathbf{N}$, tal que $f(e_1, e_2) = r$, esta toma dos aristas $e_1, e_2$ de nuestro grafo $G$ y devuelve un natural $r$ que exprese que tan 'relacionadas' est\'an $e_1, e_2$ seg\'un el modelo en cuesti\'on. (Notese que es sim\'etrica y $f(e, e) = \infty  $)
+
+Intuitivamente una idea para calcular el valor de $f$ en un par de aristas $e_1, e_2$, ser\'ia fijemos $e_1, e_2$ en un estado (perturbar ambas, no perturbar ambas, perturbar la primera, perturbar la segunda) e ir moviendose por todos los posibles grafos para cada estado del par de aristas fijado, luego pasarlo al modelo y comparar las predicciones. Luego de obtenidos los resultados para un estado fijado del par de aristas, tendremos $4$ cantidades $a, b, c, d$ en el mismo orden mencionado anteriormente, entonces tendr\'ia sentido decir que si $a+b > c + d$ es porque aparentemente el estado de las aristas fijadas si se perturban a la vez o no se perturban a la vez hace que el modelo cambie de predicci\'on. Pero ser\'ia m\'as provechoso diferenciar en todos los casos pues lo que nos interesa es construir un conjunto de aristas a perturbar que mejore la heur\'istica por tanto, definamos $P$ como el conjunto de aristas a perturbar en el paso $k$ de la heur\'istica, digamos que una de las cantidades ($a,b,c,d$) es buena si en al menos la mitad de los casos cambia la predicci\'on.
+\begin{enumerate}
+    \item Si $e_1 \in P \wedge e_2 \in P$ 
+    \begin{enumerate}
+        \item Si $a$ es buena lo dejamos asi.
+        \item Si $a$ no es buena vemos cual de las cantidades es la m\'as grande y cambiamos el estado de $e_1$ y/o $e_2$.
+    \end{enumerate}.
+
+    \item Si $e_1 \in P \wedge  e_2 \notin P$ 
+    \begin{enumerate}
+        \item Si $c$ es buena lo dejamos asi.
+        \item Si $c$ no es buena vemos cual de las cantidades es la m\'as grande y cambiamos el estado de $e_1$ y/o $e_2$.
+    \end{enumerate}
+
+    \item Si $e_1 \notin P \wedge  e_2 \in P$
+    \begin{enumerate}
+        \item Si $d$ es buena lo dejamos asi.
+        \item Si $d$ no es buena vemos cual de las cantidades es la m\'as grande y cambiamos el estado de $e_1$ y/o $e_2$.
+    \end{enumerate}
+ 
+
+    \item Si $e_1 \notin P \wedge  e_2 \notin P$
+    \begin{enumerate}
+        \item Si $b$ es buena lo dejamos asi.
+        \item Si $b$ no es buena vemos cual de las cantidades es la m\'as grande y cambiamos el estado de $e_1$ y/o $e_2$.
+    \end{enumerate}
+ 
+\end{enumerate} 
+
+Notese el patr\'on, de que dado el estado del par y las cantidades la elecci\'on es trivial.
+
+Pero evidentemente esta v\'ia no es factible pues si pudieramos realizar todo este computo, directamente el algoritmo pudiera iterar por todos los grafos buscando el menor contrafractual, entonces abstraigamos todo este computo en algunas pruebas de forma aleatoria, o sea digamos que nuestro proceso para calcular un par de aristas que pasaba por todo los grafos con esas aristas fijadas, ahora pasar\'a por una cantidad aleatoria de grafos elegidos de forma aleatoria, para tener una idea de cuanto influiria esto de forma general. 
+
+% Conclusión y recomendaciones \chapter{Conclusión y Recomendaciones} Resumen de los resultados y recomendaciones
+
+% Bibliografía \bibliographystyle{plain} \bibliography{referencias}
+
+% Apéndices \appendix \chapter{Apéndice A} Contenido del apéndice A
+
+
+\end{document} $
