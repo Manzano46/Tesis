@@ -1,12 +1,23 @@
 \documentclass[11pt,letterpaper]{report} \usepackage[utf8]{inputenc} \usepackage[spanish]{babel}
 
-% Configuración de margenes y ancho de página \oddsidemargin=1.0cm \evensidemargin=1.0cm \topmargin=1.0cm \textwidth=16.5cm \textheight=22.5cm \parindent=1.25cm \parskip=0.5cm
+% Configuración de margenes y ancho de página 
+\oddsidemargin=1.0cm \evensidemargin=1.0cm \topmargin=1.0cm \textwidth=16.5cm \textheight=22.5cm \parindent=1.25cm \parskip=0.5cm
 
-% Paquetes adicionales \usepackage{graphicx} \usepackage{amsmath} \usepackage{algorithm} \usepackage{algorithmic}
+% Paquetes adicionales 
+\usepackage{graphicx} \usepackage{amsmath} \usepackage{algorithm} \usepackage{algorithmic}
 
-% Definiciones personalizadas \newtheorem{teorema}{Teorema} \newtheorem{lemma}{Lema} \newtheorem{corolario}{Corolario} \newtheorem{definicion}{Definición}
+% Definiciones personalizadas 
+\newtheorem{teorema}{Teorema} \newtheorem{lemma}{Lema} \newtheorem{corolario}{Corolario} \newtheorem{definicion}{Definición}
+
+% Título, autor y fecha
+\title{An\'alisis de topolog\'ia de grafos para encontrar contrafractuales de modelos de caja negra}
+\author{Kevin Manzano Rodríguez}
+\date{\today} % Puedes cambiar \today por una fecha específica si lo prefieres
+
 
 \begin{document}
+
+\maketitle
 
 \thispagestyle{empty} \centering {\scshape\LARGE Universidad de La Habana}\\{\scshape\LARGE Facultad de Matem\'atica y Computaci\'on}\\ {\scshape\LARGE Tesis de Licenciatura}\ \bigskip \par\vspace{4cm} {\scshape\LARGE \textbf{Kevin Manzano Rodr\'iguez}}\ \medskip \textit{Trabajo realizado bajo la dirección del}\ \textit{Profesor \textbf{Rodrigo Garc\'ia G\'omez}}\ \vspace*{2cm}
 
@@ -56,6 +67,18 @@ Intuitivamente una idea para calcular el valor de $f$ en un par de aristas $e_1,
 Notese el patr\'on, de que dado el estado del par y las cantidades la elecci\'on es trivial.
 
 Pero evidentemente esta v\'ia no es factible pues si pudieramos realizar todo este computo, directamente el algoritmo pudiera iterar por todos los grafos buscando el menor contrafractual, entonces abstraigamos todo este computo en algunas pruebas de forma aleatoria, o sea digamos que nuestro proceso para calcular un par de aristas que pasaba por todo los grafos con esas aristas fijadas, ahora pasar\'a por una cantidad aleatoria de grafos elegidos de forma aleatoria, para tener una idea de cuanto influiria esto de forma general. 
+
+\chapter{Capítulo 3}
+
+Supongamos que tenemos todas las categorias existentes en nuestro dataset $C_1, C_2, ..., C_m$ y queremos generar un contrafractual para el grafo $G$ con el modelo $M$, si tenemos al menos una categor\'ia diferente $C_i$ donde esta es a la que pertenece $G$, un contrafractual v\'alido para $G$ con $M$ ser\'ia cualquier grafo que pertenece a $C_j$ con $j \ne i$. Tambi\'en ser\'ia bueno tener grafos cercanos de forma general a todos los grafos de la entrada, por lo que vamos a construir una idea de cercania.
+
+Dado una categor\'ia del grafo $C$, formemos el subconjunto de los grafos del dataset que pertenecen a $C$ (realizando una llamada al or\'aculo podemos saber a que categor\'ia pertenece), nos concierne encontrar un grafo especial intuitivamente cercano a todos los grafos de dicha categor\'ia, si se logra modelar los grafos como puntos en un espacio, entonces el problema se reducir\'ia a encontrar el punto que minimiza la distancia a todos los puntos de la categor\'ia. \\
+
+La modelaci\'on del espacio queda por concretar, pero se pudiera pensar en un espacio en el cual las caracter\'isticas son las aristas del grafo y la distancia entre dos puntos es la cantidad de aristas que difieren entre ellos.\\
+
+Dado que queremos encontrar el $x$ que minimiza la distancia de los $n$ grafos de la categor\'ia $C$ hasta \'el,  $\sum_{i=1}^{n} \sqrt{ \sum_{j=1}^{m} (x_j-y_{ij})^2 }$ donde $m$ es la dimensi\'on del espacio dada por $E*(E-1)/2$ del mayor grafo, $x_j$ la caracter\'istica $j-esima$ de $x$, y $y_{ij}$ la caracter\'istica $j-esima$ del $i-esimo$ grafo; pero notemos que esto es an\'alogo a $\sum_{i=1}^{n} \sum_{j=1}^{m} (x_j-y_{ij})^2$. Por tanto analizando la derivada en una componente $x_j$ de la funci\'on objetivo, se tiene que $\frac{\partial}{\partial x_j} \sum_{i=1}^{n} \sum_{j=1}^{m} (x_j-y_{ij})^2 = 2 \sum_{i=1}^{n} (x_j-y_{ij}) = 0$ por tanto $x_j = \frac{1}{n} \sum_{i=1}^{n} y_{ij}$, o sea que el punto que minimiza la distancia es el promedio de las caracter\'isticas de los grafos de la categor\'ia.\\
+
+Luego podemos tener un grafo 'cercano' a cualquier grafo en cada una de las categor\'ias, por lo que obtener un contrafractual consistir\'a en iterar por todas las categor\'ias diferentes a la que pertenece el grafo en cuesti\'on y devolver el m\'as cercano a \'el.
 
 % Conclusión y recomendaciones \chapter{Conclusión y Recomendaciones} Resumen de los resultados y recomendaciones
 
